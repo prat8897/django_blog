@@ -3,6 +3,19 @@ from django.utils import timezone
 from django.conf import settings
 
 # Create your models here.
+
+class PublishedManager(models.Manager):
+    def get_queryset(self) -> models.QuerySet:
+        return super().get_queryset().filter(
+            status = Post.Status.PUBLISHED
+        )
+    
+class DraftManager(models.Manager):
+    def get_queryset(self) -> models.QuerySet:
+        return super().get_queryset().filter(
+            status = Post.Status.DRAFT
+        )
+
 class Post(models.Model):
 
     class Status(models.TextChoices):
@@ -22,6 +35,10 @@ class Post(models.Model):
         on_delete=models.CASCADE,
         related_name='blog_posts'
     )
+
+    objects = models.Manager()
+    published = PublishedManager()
+    drafts = DraftManager()
 
     class Meta:
         ordering = ['-publish']
